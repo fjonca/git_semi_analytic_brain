@@ -8,78 +8,56 @@ Author: François Jonca
 """
 
 #%% Libraries import
-from scipy.fft import fft, ifft, fftfreq
-from scipy.signal import find_peaks
-import matplotlib.pyplot as plt
-import numpy as np
+##from scipy.fft import fft, ifft, fftfreq
+##from scipy.signal import find_peaks
+##import matplotlib.pyplot as plt
+##import numpy as np
 
-#%% External force definition
-F0 = 1000 #N
-T = 0.01 #s
-tf = 0.2 #s
-n = 1000 #Number of points
-t = np.linspace(0,tf,n)
 
-#%% External force computation
-f = np.zeros(np.size(t))
-
-for i in range(len(t)):
-    if t[i] <= T:
-        f[i] = (F0/2)*(1 - np.cos(2*np.pi*t[i]/T))
-    else:
-        continue
-
-#Plot force
-plt.figure(1)
-plt.plot(t,f,'-',label='External force')
-plt.xlabel('Time [s]')
-plt.ylabel('Force [N]')
-plt.grid(which='both')
-plt.legend(loc = 'best')
 
 #%% Fast-Fourier transform of f(t)
 # sample period
 T = tf/n
 # 
-fFreq = fft(f); print(np.size(fFreq))
+fFreq = fft(f); #print(size(fFreq))
 xf = fftfreq(n, T)[:n//2] #Hz
 
 #Plot spectrum
-plt.figure(2)
-plt.plot(xf, 2.0/n * np.abs(fFreq[0:n//2]),label = 'External force spectrum')
-plt.legend(loc='best')
-plt.grid()
+figure(2)
+plot(xf, 2.0/n * abs(fFreq[0:n//2]),label = 'External force spectrum')
+legend(loc='best')
+grid()
 
 #Compare with analytic spectrum
 
 #%% Extraction of 0-Hz component
-filter0Hz = np.zeros(np.size(fFreq)); filter0Hz[0] = 1
+filter0Hz = zeros(size(fFreq)); filter0Hz[0] = 1
 staticFFreq = fFreq*filter0Hz
 
-plt.figure(2)
-plt.plot(xf, 2.0/n * np.abs(staticFFreq[0:n//2]),'r--', label = '0-Hz component')
-plt.legend()
+figure(2)
+plot(xf, 2.0/n * abs(staticFFreq[0:n//2]),'r--', label = '0-Hz component')
+legend()
 
 zeroHzComponent = ifft(staticFFreq); zeroHzComponent = zeroHzComponent.real
 
-plt.figure(1)
-plt.plot(t,zeroHzComponent,'r--',label = '0-Hz component')
-plt.legend()
+figure(1)
+plot(t,zeroHzComponent,'r--',label = '0-Hz component')
+legend()
 
 #%% Extraction of vibrating component : 0-Hz component is suppressed
 # dynamicFFreq = np.zeros(np.size(fFreq)); dynamicFFreq[1:-1] = fFreq[1:-1];
-filterDynamic = np.ones(np.size(fFreq)); filterDynamic[0] = 0
+filterDynamic = ones(size(fFreq)); filterDynamic[0] = 0
 dynamicFFreq = fFreq*filterDynamic
 #Plot
-plt.figure(2)
-plt.plot(xf, 2.0/n * np.abs(dynamicFFreq[0:n//2]),'b--', label = 'Vibrating component')
-plt.legend()
+figure(2)
+plot(xf, 2.0/n * abs(dynamicFFreq[0:n//2]),'b--', label = 'Vibrating component')
+legend()
 
 vibratingComponent = ifft(dynamicFFreq); vibratingComponent = vibratingComponent.real
 #Plot
-plt.figure(1)
-plt.plot(t,vibratingComponent,'b--',label = 'Vibrating component')
-plt.legend()
+figure(1)
+plot(t,vibratingComponent,'b--',label = 'Vibrating component')
+legend()
 
 #%% Other way : extract before and after the first zero-energy value
 # spectrum = fFreq
@@ -114,4 +92,3 @@ plt.legend()
 # plt.legend(loc = 'best')
 
 #%% Show plots
-plt.show()
